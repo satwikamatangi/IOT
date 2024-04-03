@@ -1,0 +1,76 @@
+Arduino IDE code
+#include <WiFi.h>
+#include <Servo.h>
+
+// WiFi credentials
+const char* ssid = "YourWiFiSSID";
+const char* password = "YourWiFiPassword";
+
+// Pin definitions
+const int vibrationSensorPin = 2;
+const int tiltSensorPin = 3;
+const int servoControlPin = 4;
+const int buzzerPin = 5;
+const int ledPin = 6;
+
+// Servo motor object
+Servo servoMotor;
+
+void setup() {
+  Serial.begin(9600);
+  
+  pinMode(vibrationSensorPin, INPUT);
+  pinMode(tiltSensorPin, INPUT);
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
+  
+  // Attach servo motor
+  servoMotor.attach(servoControlPin);
+
+  // Connect to WiFi
+  connectToWiFi();
+}
+
+void loop() {
+  int vibrationValue = digitalRead(vibrationSensorPin);
+  int tiltValue = digitalRead(tiltSensorPin);
+
+  if (vibrationValue == HIGH || tiltValue == HIGH) {
+    triggerAlarm();
+    adjustCameraAngle();
+    sendNotification();
+  }
+
+  delay(1000);
+}
+
+void connectToWiFi() {
+  Serial.println("Connecting to WiFi...");
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+  }
+
+  Serial.println("Connected to WiFi");
+}
+
+void triggerAlarm() {
+  digitalWrite(buzzerPin, HIGH);
+  digitalWrite(ledPin, HIGH);
+  delay(2000); // Alarm duration
+  digitalWrite(buzzerPin, LOW);
+  digitalWrite(ledPin, LOW);
+}
+
+void adjustCameraAngle() {
+  // Adjust the camera angle using the servo motor
+  servoMotor.write(90); // Example: move the camera to the center position
+  delay(1000); // Add a delay to allow the servo to move (adjust as needed)
+}
+
+void sendNotification() {
+  // Code to send notification to smartphone
+  // Example: Use WiFiClient to send data to a server or use a service like Pushbullet
+}
